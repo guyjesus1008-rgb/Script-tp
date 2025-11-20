@@ -1,0 +1,538 @@
+-- Variáveis para armazenar as posições marcadas e controle do loop
+local posicaoMarcada1 = nil  -- Primeira posição (destino final)
+local posicaoMarcada2 = nil  -- Segunda posição (meio)
+local posicaoMarcada3 = nil  -- Terceira posição (início)
+local empurrando = false
+local velocidadeEmpurrao = 50 -- Velocidade padrão
+
+-- Criar a interface
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "@drhzy"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Criar o frame principal
+local mainFrame = Instance.new("Frame")
+local frameHeight = 230 -- Aumentado para caber os novos botões
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 200, 0, frameHeight)
+mainFrame.Position = UDim2.new(0, 10, 0, 10)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainFrame.BorderSizePixel = 2
+mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.Parent = screenGui
+
+-- Adicionar título
+local titulo = Instance.new("TextLabel")
+titulo.Name = "Titulo"
+titulo.Size = UDim2.new(1, 0, 0, 30)
+titulo.Position = UDim2.new(0, 0, 0, 0)
+titulo.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+titulo.BorderSizePixel = 0
+titulo.Text = "@drhzy"
+titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+titulo.TextScaled = true
+titulo.Font = Enum.Font.GothamBold
+titulo.Parent = mainFrame
+
+-- Botão "Marca Posição 1" (Destino Final)
+local botaoMarca1 = Instance.new("TextButton")
+botaoMarca1.Name = "MarcaPosicao1"
+botaoMarca1.Size = UDim2.new(0.9, 0, 0, 25)
+botaoMarca1.Position = UDim2.new(0.05, 0, 0, 35)
+botaoMarca1.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+botaoMarca1.BorderSizePixel = 0
+botaoMarca1.Text = "Marca Posição 1 (Destino)"
+botaoMarca1.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoMarca1.TextScaled = true
+botaoMarca1.Font = Enum.Font.Gotham
+botaoMarca1.Parent = mainFrame
+
+-- Botão "Marca Posição 2" (Meio)
+local botaoMarca2 = Instance.new("TextButton")
+botaoMarca2.Name = "MarcaPosicao2"
+botaoMarca2.Size = UDim2.new(0.9, 0, 0, 25)
+botaoMarca2.Position = UDim2.new(0.05, 0, 0, 65)
+botaoMarca2.BackgroundColor3 = Color3.fromRGB(0, 150, 150)
+botaoMarca2.BorderSizePixel = 0
+botaoMarca2.Text = "Marca Posição 2 (Meio)"
+botaoMarca2.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoMarca2.TextScaled = true
+botaoMarca2.Font = Enum.Font.Gotham
+botaoMarca2.Parent = mainFrame
+
+-- Botão "Marca Posição 3" (Início)
+local botaoMarca3 = Instance.new("TextButton")
+botaoMarca3.Name = "MarcaPosicao3"
+botaoMarca3.Size = UDim2.new(0.9, 0, 0, 25)
+botaoMarca3.Position = UDim2.new(0.05, 0, 0, 95)
+botaoMarca3.BackgroundColor3 = Color3.fromRGB(150, 100, 0)
+botaoMarca3.BorderSizePixel = 0
+botaoMarca3.Text = "Marca Posição 3 (Início)"
+botaoMarca3.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoMarca3.TextScaled = true
+botaoMarca3.Font = Enum.Font.Gotham
+botaoMarca3.Parent = mainFrame
+
+-- Botão "TP"
+local botaoTP = Instance.new("TextButton")
+botaoTP.Name = "TP"
+botaoTP.Size = UDim2.new(0.9, 0, 0, 25)
+botaoTP.Position = UDim2.new(0.05, 0, 0, 125)
+botaoTP.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+botaoTP.BorderSizePixel = 0
+botaoTP.Text = "TP (Vel: " .. velocidadeEmpurrao .. ")"
+botaoTP.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoTP.TextScaled = true
+botaoTP.Font = Enum.Font.Gotham
+botaoTP.Parent = mainFrame
+
+-- Botão "Mudar Velocidade"
+local botaoVelocidade = Instance.new("TextButton")
+botaoVelocidade.Name = "MudarVelocidade"
+botaoVelocidade.Size = UDim2.new(0.9, 0, 0, 25)
+botaoVelocidade.Position = UDim2.new(0.05, 0, 0, 155)
+botaoVelocidade.BackgroundColor3 = Color3.fromRGB(150, 0, 150)
+botaoVelocidade.BorderSizePixel = 0
+botaoVelocidade.Text = "Mudar Velocidade"
+botaoVelocidade.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoVelocidade.TextScaled = true
+botaoVelocidade.Font = Enum.Font.Gotham
+botaoVelocidade.Parent = mainFrame
+
+-- Botão "Fazer Percurso 2 Pontos"
+local botaoPercurso2 = Instance.new("TextButton")
+botaoPercurso2.Name = "FazerPercurso2"
+botaoPercurso2.Size = UDim2.new(0.9, 0, 0, 25)
+botaoPercurso2.Position = UDim2.new(0.05, 0, 0, 185)
+botaoPercurso2.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+botaoPercurso2.BorderSizePixel = 0
+botaoPercurso2.Text = "Percurso 2 Pontos"
+botaoPercurso2.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoPercurso2.TextScaled = true
+botaoPercurso2.Font = Enum.Font.Gotham
+botaoPercurso2.Parent = mainFrame
+
+-- Botão "Fazer Percurso 3 Pontos"
+local botaoPercurso3 = Instance.new("TextButton")
+botaoPercurso3.Name = "FazerPercurso3"
+botaoPercurso3.Size = UDim2.new(0.9, 0, 0, 25)
+botaoPercurso3.Position = UDim2.new(0.05, 0, 0, 215)
+botaoPercurso3.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+botaoPercurso3.BorderSizePixel = 0
+botaoPercurso3.Text = "Percurso 3 Pontos"
+botaoPercurso3.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoPercurso3.TextScaled = true
+botaoPercurso3.Font = Enum.Font.Gotham
+botaoPercurso3.Parent = mainFrame
+
+-- Função para atualizar o texto do botão TP
+local function atualizarTextoBotaoTP()
+    botaoTP.Text = "TP (Vel: " .. velocidadeEmpurrao .. ")"
+end
+
+-- Função para calcular direção e velocidade do empurrão
+local function calcularEmpurrao(posicaoAtual, posicaoDestino)
+    local direcao = (posicaoDestino - posicaoAtual).Unit
+    return direcao * velocidadeEmpurrao
+end
+
+-- Função para verificar se chegou perto o suficiente da posição marcada
+local function chegouNoDestino(posicaoAtual, posicaoDestino)
+    local distancia = (posicaoAtual - posicaoDestino).Magnitude
+    return distancia < 3 -- Considera que chegou quando está a 3 unidades de distância
+end
+
+-- Função para empurrar automaticamente até chegar no destino
+local function empurrarParaDestino(posicaoDestino)
+    local player = game.Players.LocalPlayer
+    
+    while empurrando and posicaoDestino do
+        local character = player.Character
+        if character then
+            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+            if humanoidRootPart then
+                -- Verificar se chegou no destino
+                if chegouNoDestino(humanoidRootPart.Position, posicaoDestino) then
+                    print("Chegou no ponto!")
+                    return true
+                end
+                
+                -- Calcular e aplicar empurrão
+                local empurrao = calcularEmpurrao(humanoidRootPart.Position, posicaoDestino)
+                humanoidRootPart.Velocity = empurrao
+                
+                -- Mostrar informações de debug
+                local distancia = (humanoidRootPart.Position - posicaoDestino).Magnitude
+                print("Empurrando... Distância: " .. string.format("%.2f", distancia) .. " | Velocidade: " .. velocidadeEmpurrao)
+            else
+                warn("HumanoidRootPart não encontrado!")
+                return false
+            end
+        else
+            warn("Personagem não encontrado!")
+            return false
+        end
+        
+        wait(0.1) -- Pequeno delay para não sobrecarregar
+    end
+    
+    return false
+end
+
+-- Função para marcar a posição 1 (destino final)
+local function marcarPosicao1()
+    if empurrando then
+        empurrando = false
+        wait(0.2)
+    end
+    
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    
+    if character then
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            posicaoMarcada1 = humanoidRootPart.Position
+            print("Posição 1 (Destino) marcada: " .. tostring(posicaoMarcada1))
+            
+            -- Feedback visual
+            botaoMarca1.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+            wait(0.5)
+            botaoMarca1.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+        else
+            warn("HumanoidRootPart não encontrado!")
+        end
+    else
+        warn("Personagem não encontrado!")
+    end
+end
+
+-- Função para marcar a posição 2 (meio)
+local function marcarPosicao2()
+    if empurrando then
+        empurrando = false
+        wait(0.2)
+    end
+    
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    
+    if character then
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            posicaoMarcada2 = humanoidRootPart.Position
+            print("Posição 2 (Meio) marcada: " .. tostring(posicaoMarcada2))
+            
+            -- Feedback visual
+            botaoMarca2.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+            wait(0.5)
+            botaoMarca2.BackgroundColor3 = Color3.fromRGB(0, 150, 150)
+        else
+            warn("HumanoidRootPart não encontrado!")
+        end
+    else
+        warn("Personagem não encontrado!")
+    end
+end
+
+-- Função para marcar a posição 3 (início)
+local function marcarPosicao3()
+    if empurrando then
+        empurrando = false
+        wait(0.2)
+    end
+    
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    
+    if character then
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            posicaoMarcada3 = humanoidRootPart.Position
+            print("Posição 3 (Início) marcada: " .. tostring(posicaoMarcada3))
+            
+            -- Feedback visual
+            botaoMarca3.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+            wait(0.5)
+            botaoMarca3.BackgroundColor3 = Color3.fromRGB(150, 100, 0)
+        else
+            warn("HumanoidRootPart não encontrado!")
+        end
+    else
+        warn("Personagem não encontrado!")
+    end
+end
+
+-- Função para iniciar o empurrão automático para a posição 1
+local function iniciarEmpurrao()
+    if not posicaoMarcada1 then
+        warn("Nenhuma posição 1 (destino) foi marcada ainda!")
+        botaoTP.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
+        wait(0.5)
+        botaoTP.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        return
+    end
+    
+    if empurrando then
+        -- Se já está empurrando, para o empurrão
+        empurrando = false
+        botaoTP.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        print("Empurrão cancelado!")
+    else
+        -- Inicia o empurrão automático para a posição 1
+        empurrando = true
+        botaoTP.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        print("Iniciando empurrão para Posição 1 com velocidade " .. velocidadeEmpurrao .. "...")
+        
+        spawn(function()
+            empurrarParaDestino(posicaoMarcada1)
+            empurrando = false
+            botaoTP.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+            print("Empurrão finalizado!")
+        end)
+    end
+end
+
+-- Função para fazer o percurso de 2 pontos (Posição 2 → Posição 1)
+local function fazerPercurso2Pontos()
+    if not posicaoMarcada1 then
+        warn("Nenhuma posição 1 (destino) foi marcada ainda!")
+        botaoPercurso2.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
+        wait(0.5)
+        botaoPercurso2.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+        return
+    end
+    
+    if not posicaoMarcada2 then
+        warn("Nenhuma posição 2 (partida) foi marcada ainda!")
+        botaoPercurso2.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
+        wait(0.5)
+        botaoPercurso2.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+        return
+    end
+    
+    if empurrando then
+        empurrando = false
+        botaoPercurso2.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+        print("Percurso cancelado!")
+    else
+        empurrando = true
+        botaoPercurso2.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        
+        spawn(function()
+            local player = game.Players.LocalPlayer
+            local character = player.Character
+            
+            if character then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    -- Teleporta para a posição 2
+                    humanoidRootPart.Position = posicaoMarcada2
+                    print("Teleportado para Posição 2 (partida)")
+                    
+                    -- Aguarda um pouco e inicia o empurrão para posição 1
+                    wait(0.5)
+                    print("Iniciando percurso da Posição 2 para Posição 1...")
+                    
+                    if empurrarParaDestino(posicaoMarcada1) then
+                        print("Percurso de 2 pontos finalizado!")
+                    end
+                end
+            end
+            
+            empurrando = false
+            botaoPercurso2.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+        end)
+    end
+end
+
+-- Função para fazer o percurso de 3 pontos (Posição 3 → Posição 2 → Posição 1)
+local function fazerPercurso3Pontos()
+    if not posicaoMarcada1 then
+        warn("Nenhuma posição 1 (destino) foi marcada ainda!")
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
+        wait(0.5)
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        return
+    end
+    
+    if not posicaoMarcada2 then
+        warn("Nenhuma posição 2 (meio) foi marcada ainda!")
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
+        wait(0.5)
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        return
+    end
+    
+    if not posicaoMarcada3 then
+        warn("Nenhuma posição 3 (início) foi marcada ainda!")
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(150, 150, 0)
+        wait(0.5)
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        return
+    end
+    
+    if empurrando then
+        empurrando = false
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        print("Percurso cancelado!")
+    else
+        empurrando = true
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        
+        spawn(function()
+            local player = game.Players.LocalPlayer
+            local character = player.Character
+            
+            if character then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    -- Teleporta para a posição 3 (início)
+                    humanoidRootPart.Position = posicaoMarcada3
+                    print("Teleportado para Posição 3 (início)")
+                    wait(0.5)
+                    
+                    -- Primeira etapa: Posição 3 → Posição 2
+                    print("Iniciando primeira etapa: Posição 3 → Posição 2")
+                    if empurrarParaDestino(posicaoMarcada2) then
+                        print("Chegou na Posição 2!")
+                        wait(0.5)
+                        
+                        -- Segunda etapa: Posição 2 → Posição 1
+                        print("Iniciando segunda etapa: Posição 2 → Posição 1")
+                        if empurrarParaDestino(posicaoMarcada1) then
+                            print("Percurso de 3 pontos finalizado!")
+                        end
+                    end
+                end
+            end
+            
+            empurrando = false
+            botaoPercurso3.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        end)
+    end
+end
+
+-- Função para mudar a velocidade (mantida igual)
+local function mudarVelocidade()
+    if empurrando then
+        empurrando = false
+        botaoTP.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        botaoPercurso2.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+        botaoPercurso3.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        wait(0.2)
+    end
+    
+    -- Criar popup para inserir nova velocidade (código mantido igual)
+    local popupFrame = Instance.new("Frame")
+    popupFrame.Name = "PopupVelocidade"
+    popupFrame.Size = UDim2.new(0, 250, 0, 150)
+    popupFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+    popupFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    popupFrame.BorderSizePixel = 2
+    popupFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    popupFrame.Parent = screenGui
+    
+    local tituloPopup = Instance.new("TextLabel")
+    tituloPopup.Name = "TituloPopup"
+    tituloPopup.Size = UDim2.new(1, 0, 0, 40)
+    tituloPopup.Position = UDim2.new(0, 0, 0, 0)
+    tituloPopup.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tituloPopup.BorderSizePixel = 0
+    tituloPopup.Text = "Mudar Velocidade"
+    tituloPopup.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tituloPopup.TextScaled = true
+    tituloPopup.Font = Enum.Font.GothamBold
+    tituloPopup.Parent = popupFrame
+    
+    local textoAtual = Instance.new("TextLabel")
+    textoAtual.Name = "TextoAtual"
+    textoAtual.Size = UDim2.new(1, 0, 0, 25)
+    textoAtual.Position = UDim2.new(0, 0, 0, 45)
+    textoAtual.BackgroundTransparency = 1
+    textoAtual.Text = "Velocidade Atual: " .. velocidadeEmpurrao
+    textoAtual.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textoAtual.TextScaled = true
+    textoAtual.Font = Enum.Font.Gotham
+    textoAtual.Parent = popupFrame
+    
+    local caixaTexto = Instance.new("TextBox")
+    caixaTexto.Name = "CaixaTexto"
+    caixaTexto.Size = UDim2.new(0.8, 0, 0, 30)
+    caixaTexto.Position = UDim2.new(0.1, 0, 0, 75)
+    caixaTexto.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    caixaTexto.BorderSizePixel = 0
+    caixaTexto.Text = tostring(velocidadeEmpurrao)
+    caixaTexto.TextColor3 = Color3.fromRGB(255, 255, 255)
+    caixaTexto.TextScaled = true
+    caixaTexto.PlaceholderText = "Digite a velocidade..."
+    caixaTexto.Font = Enum.Font.Gotham
+    caixaTexto.Parent = popupFrame
+    
+    local botaoConfirmar = Instance.new("TextButton")
+    botaoConfirmar.Name = "Confirmar"
+    botaoConfirmar.Size = UDim2.new(0.8, 0, 0, 25)
+    botaoConfirmar.Position = UDim2.new(0.1, 0, 0, 110)
+    botaoConfirmar.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    botaoConfirmar.BorderSizePixel = 0
+    botaoConfirmar.Text = "Confirmar"
+    botaoConfirmar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    botaoConfirmar.TextScaled = true
+    botaoConfirmar.Font = Enum.Font.Gotham
+    botaoConfirmar.Parent = popupFrame
+    
+    local botaoFechar = Instance.new("TextButton")
+    botaoFechar.Name = "Fechar"
+    botaoFechar.Size = UDim2.new(0, 25, 0, 25)
+    botaoFechar.Position = UDim2.new(1, -30, 0, 5)
+    botaoFechar.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    botaoFechar.BorderSizePixel = 0
+    botaoFechar.Text = "X"
+    botaoFechar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    botaoFechar.TextScaled = true
+    botaoFechar.Font = Enum.Font.GothamBold
+    botaoFechar.Parent = popupFrame
+    
+    local function fecharPopup()
+        popupFrame:Destroy()
+    end
+    
+    local function confirmarVelocidade()
+        local novaVelocidade = tonumber(caixaTexto.Text)
+        
+        if novaVelocidade and novaVelocidade > 0 then
+            if novaVelocidade > 500 then
+                warn("Velocidade muito alta! Limitada a 500.")
+                novaVelocidade = 500
+            end
+            
+            velocidadeEmpurrao = novaVelocidade
+            print("Velocidade alterada para: " .. velocidadeEmpurrao)
+            atualizarTextoBotaoTP()
+            fecharPopup()
+        else
+            warn("Por favor, digite um número válido maior que 0!")
+            caixaTexto.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+            wait(0.5)
+            caixaTexto.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        end
+    end
+    
+    botaoConfirmar.MouseButton1Click:Connect(confirmarVelocidade)
+    botaoFechar.MouseButton1Click:Connect(fecharPopup)
+    
+    caixaTexto.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            confirmarVelocidade()
+        end
+    end)
+end
+
+-- Conectar as funções aos botões
+botaoMarca1.MouseButton1Click:Connect(marcarPosicao1)
+botaoMarca2.MouseButton1Click:Connect(marcarPosicao2)
+botaoMarca3.MouseButton1Click:Connect(marcarPosicao3)
+botaoTP.MouseButton1Click:Connect(iniciarEmpurrao)
+botaoVelocidade.MouseButton1Click:Connect(mudarVelocidade)
+botaoPercurso2.MouseButton1Click:Connect(fazerPercurso2Pontos)
+botaoPerc
